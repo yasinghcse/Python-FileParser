@@ -52,13 +52,15 @@ for file in glob.glob("*.js"):
     #find all the occurences of comments and replace it
     for x in re.findall(r'("[^\n]*"(?!\\))|(//[^\n]*$|/(?!\\)\*[\s\S]*?\*(?!\\)/)',content,8):
         content=content.replace(x[1],'')
-    #open the main file again and overwrite the contents to it.
-    fout=open(file,'w')
+
+    #extract the file name and create a new file with .ts format
+    baseName=os.path.splitext(file)[0]
+    newname=baseName+".ts"
+
+    #open the main file and write the new contents to it.
+    fout=open(newname,'w')
     fout.write("/** iDream Interactive **/\n");
     fout.writelines(content)
-    #extract the file name and rename it by appending the .ts as the file format to the file
-    name=os.path.splitext(file)[0]
-    os.rename(file, name+".ts")
 print("File processing done!!")
 
 
@@ -72,6 +74,7 @@ except:
 print("Starting Archiving ......")
 zf = zipfile.ZipFile(sys.argv[2]+"/"+outputfilename, "w")
 for file in glob.glob("*.ts"):
-    zf.write(file)
+    zf.write(file) #write to zip folder
+    os.remove(file) #remove the manipulated files in source dir
 zf.close()
 print("Archiving Done!!!")
